@@ -23,7 +23,7 @@ export default function EditorPage() {
 
   async function generate() {
     setError(null);
-    setSpec(null);        // clear any previous chart
+    setSpec(null);
     setLoading(true);
     try {
       const res = await fetch("/api/chart", {
@@ -34,8 +34,9 @@ export default function EditorPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error || res.statusText);
       setSpec(data.spec as SpecT);
-    } catch (e: any) {
-      setError(e?.message ?? "Failed to generate chart");
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : "Failed to generate chart";
+      setError(msg);
     } finally {
       setLoading(false);
     }
