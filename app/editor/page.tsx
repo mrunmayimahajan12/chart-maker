@@ -1,19 +1,38 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { Suspense, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
+
+// Optional: also force this route to render dynamically (avoids pre-rendering)
+// export const dynamic = "force-dynamic";
 
 type NodeT = { id: string; label: string; kind?: string };
 type EdgeT = { from: string; to: string; label?: string };
 type SpecT = { chartType: "flowchart" | "rulemap" | "timeline"; nodes: NodeT[]; edges: EdgeT[] };
 
 export default function EditorPage() {
+  return (
+    <Suspense fallback={<EditorLoading />}>
+      <EditorClient />
+    </Suspense>
+  );
+}
+
+function EditorLoading() {
+  return (
+    <main className="min-h-screen bg-[#0b0f17] p-6 grid place-items-center">
+      <div className="text-slate-300 text-sm">Loading editor…</div>
+    </main>
+  );
+}
+
+function EditorClient() {
   const search = useSearchParams();
   const router = useRouter();
 
   const initialText = decodeURIComponent(search.get("text") || "");
   const initialPrompt = decodeURIComponent(search.get("prompt") || "");
-  const chartType = (search.get("chartType") as SpecT["chartType"]) || "flowchart";
+  const chartType = ((search.get("chartType") as SpecT["chartType"]) || "flowchart");
 
   const [text, setText] = useState(initialText);
   const [prompt, setPrompt] = useState(initialPrompt || "Make a clear, step-by-step flowchart.");
