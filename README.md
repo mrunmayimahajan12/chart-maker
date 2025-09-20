@@ -7,11 +7,6 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 Turn highlighted text into clean, editable flowcharts.  
 Built with **TypeScript + Node.js** (Next.js App Router), **Mermaid**, and **Groq**.
 
-**Live Demo:** `https://<your-vercel-url>`  
-**GitHub Repo:** `https://github.com/<your-username>/<your-repo>`
-
-> Replace the two links above before submitting.
-
 ---
 
 ##About
@@ -71,16 +66,6 @@ When you click **Generate**:
    If LLM paths fail/unavailable, the API detects simple `If…`/negation patterns → decision nodes with yes/no edges.
 4. **Linear fallback.**  
    Final safety net (sentences/arrows/numbered lists → linear flow), so you always get a chart.
-
-The API returns:
-```json
-{
-  "spec": { "chartType": "flowchart", "nodes": [...], "edges": [...] },
-  "mermaid": "flowchart TD
- ...",
-  "info": { "usedPrompt": true, "usedLLM": true, "path": "llm-json→compile" }
-}
-```
 
 ---
 
