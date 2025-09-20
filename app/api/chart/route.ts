@@ -111,7 +111,7 @@ function inferHint(paramType?: ChartType, promptText?: string): ChartType {
 /* ── LLM: JSON graph (primary) ─────────────────────────────────────────── */
 async function callGroqForGraphJSON(text: string, hint: ChartType, userPrompt?: string): Promise<JGraph | null> {
   const apiKey = process.env.GROQ_API_KEY; if (!apiKey) return null;
-  const model = process.env.GROQ_MODEL || "llama-3.1-70b-versatile";
+  const model = process.env.GROQ_MODEL || "llama-3.3-70b-versatile";
 
   const system =
     "Extract a flowchart as JSON. Return ONLY valid JSON (no prose, no fences).\n" +
@@ -244,7 +244,7 @@ function heuristicGraphFromText(text: string): JGraph | null {
 /* ── LLM: Mermaid (secondary) ──────────────────────────────────────────── */
 async function callGroqForMermaid(text: string, hint: ChartType, userPrompt?: string): Promise<string | null> {
   const apiKey = process.env.GROQ_API_KEY; if (!apiKey) return null;
-  const model = process.env.GROQ_MODEL || "llama-3.1-70b-versatile";
+  const model = process.env.GROQ_MODEL || "llama-3.3-70b-versatile";
   const system =
     "Create a Mermaid diagram. Return Mermaid code ONLY (prefer a ```mermaid code fence```).\n" +
     "For flowcharts: use {label} for decisions (with two labeled outgoing edges) and [label] for steps. Keep labels concise (<=80 chars).";
@@ -316,3 +316,6 @@ export async function POST(req: NextRequest) {
     return bad(500, msg);
   }
 }
+
+
+
