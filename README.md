@@ -2,7 +2,7 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Getting Started
 
-# Chart Maker — LawBandit Internship Demo (TypeScript + Node.js)
+# Chart Maker (TypeScript + Node.js)
 
 Turn highlighted text into clean, editable flowcharts.  
 Built with **TypeScript + Node.js** (Next.js App Router), **Mermaid**, and **Groq**.
@@ -124,25 +124,6 @@ components/
 
 ---
 
-## Deployment (Vercel)
-
-1. Push to GitHub.  
-2. Import the repo in Vercel.  
-3. In **Project Settings → Environment Variables**, add:
-   - `GROQ_API_KEY`
-   - (optional) `GROQ_MODEL` = `llama-3.3-70b-versatile`
-4. Deploy.
-
-> This project is ESLint-safe. If your CI blocks on lint rules in a different configuration, you can temporarily use:
-> ```ts
-> // next.config.ts
-> export default {
->   eslint: { ignoreDuringBuilds: true },
-> };
-> ```
-> (Not needed with the current codebase.)
-
----
 
 ## Troubleshooting
 
@@ -155,13 +136,3 @@ components/
 
 ---
 
-## License
-
-MIT
-
----
-
-**Submission Checklist**
-- [ ] Replace the Live Demo + GitHub links at the top  
-- [ ] Ensure `GROQ_API_KEY` is set in both local and Vercel environments  
-- [ ] Open `/demo`, highlight → **Make Chart** → `/editor`, add a prompt, **Generate** ✅
