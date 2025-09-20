@@ -1,36 +1,159 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+Chart Maker — LawBandit Internship Demo (TypeScript + Node.js)
 
-## Getting Started
+Turn highlighted text into clean, editable flowcharts.
+Built with TypeScript + Node.js (Next.js App Router), Mermaid, and Groq.
 
-First, run the development server:
+Live Demo: https://<your-vercel-url>
+GitHub Repo: https://github.com/<your-username>/<your-repo>
 
-```bash
+Replace the two links above before submitting.
+
+What this is
+
+A small feature demo for law students: highlight text from notes → click Make Chart → land in an Editor where you enter a prompt and generate a Mermaid flowchart (and copy the Mermaid code if you want).
+
+Quick Start (Local)
+# 1) Clone & install
+git clone https://github.com/<your-username>/<your-repo>.git
+cd <your-repo>
+npm i   # or: yarn / pnpm
+
+# 2) Env vars
+cp .env.local.example .env.local  # if the example file exists; otherwise create it
+
+# .env.local  (repo root)
+# --------------------------------------------------
+# Required for LLM paths (fallbacks still work without it)
+GROQ_API_KEY=sk_********************************
+# Optional (the app already defaults to this model if unset)
+GROQ_MODEL=llama-3.3-70b-versatile
+# --------------------------------------------------
+
+# 3) Run
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+# open http://localhost:3000/demo
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+How to use the UI / Workflow
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Go to /demo. This page contains a few sample texts (already in the page).
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Highlight any portion of the text you want to convert into a chart.
 
-## Learn More
+Click Make Chart. You’ll be taken to /editor with the highlighted text prefilled.
 
-To learn more about Next.js, take a look at the following resources:
+In the Prompt field, write instructions for the model (e.g., “Make a flowchart with decision diamonds and labeled yes/no edges.”).
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Click Generate.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+The chart renders on the right. Below it, you’ll see the Mermaid code (read-only) you can copy anywhere.
 
-## Deploy on Vercel
+The small Engine label shows which path generated the chart (LLM or fallback).
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Edit the prompt or the source text and click Generate again to iterate.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The /demo page’s sample texts are only for demonstration—you can paste your own text into the Editor page as well.
+
+How it works (LLM-first with graceful fallbacks)
+
+When you click Generate:
+
+LLM → JSON Graph (preferred).
+The API asks the LLM for a typed graph (nodes + edges + decision types), then compiles it to Mermaid.
+
+LLM → Mermaid (secondary).
+If JSON isn’t returned, the API asks for Mermaid code and parses it back to a spec.
+
+Heuristic brancher.
+If LLM paths fail/unavailable, the API detects simple If…/negation patterns → decision nodes with yes/no edges.
+
+Linear fallback.
+Final safety net (sentences/arrows/numbered lists → linear flow), so you always get a chart.
+
+The API returns:
+
+{
+  "spec": { "chartType": "flowchart", "nodes": [...], "edges": [...] },
+  "mermaid": "flowchart TD\n ...",
+  "info": { "usedPrompt": true, "usedLLM": true, "path": "llm-json→compile" }
+}
+
+Tech Stack (meets “TypeScript + Node.js”)
+
+Language: TypeScript
+
+Runtime: Node.js serverless function (Next.js API route)
+
+See app/api/chart/route.ts:
+
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+
+
+Framework: Next.js (App Router)
+
+LLM: Groq (server-side fetch from the Node API route)
+
+Viz: Mermaid (client-side renderer)
+
+Project Structure (key parts)
+app/
+  demo/page.tsx          # highlight surface → opens editor with selected text
+  editor/page.tsx        # prompt + text input, generate + render Mermaid
+  api/chart/route.ts     # Node.js API route — LLM-first pipeline + fallbacks
+components/
+  Mermaid.tsx            # Mermaid renderer
+  HighlightSurface.tsx   # selection/highlight helper for the demo page
+
+Configuration
+Env Var	Required	Default	Notes
+GROQ_API_KEY	✅	—	LLM engines need this
+GROQ_MODEL	❌	llama-3.3-70b-versatile	Can override with a supported model
+
+If the key/model is missing or rate-limited, the app still works via heuristic and linear fallbacks.
+
+Deployment (Vercel)
+
+Push to GitHub.
+
+Import the repo in Vercel.
+
+In Project Settings → Environment Variables, add:
+
+GROQ_API_KEY
+
+(optional) GROQ_MODEL = llama-3.3-70b-versatile
+
+Deploy.
+
+This project is ESLint-safe. If your CI blocks on lint rules in a different configuration, you can temporarily use:
+
+// next.config.ts
+export default {
+  eslint: { ignoreDuringBuilds: true },
+};
+
+
+(Not needed with the current codebase.)
+
+Troubleshooting
+
+Engine shows heuristic instead of LLM:
+Check .env.local/Vercel env; ensure the model is valid and you restarted the dev server after editing env.
+
+LLM errors in logs:
+The app will fall back and keep working; switch llmOnly in the request body to true if you want failures to surface for debugging.
+
+Mermaid render issues:
+Try regenerating; ensure Mermaid code starts with flowchart or timeline.
+
+License
+
+MIT
+
+Submission Checklist
+
+ Replace the Live Demo + GitHub links at the top
+
+ Ensure GROQ_API_KEY is set in both local and Vercel environments
+
+ Open /demo, highlight → Make Chart → /editor, add a prompt, Generat
